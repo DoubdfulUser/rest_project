@@ -15,5 +15,3 @@ class Currency(models.Model):
 
 
 
-
-

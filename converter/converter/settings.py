@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'converter_app.apps.ConverterAppConfig',
-    'users'
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +135,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'converter_page'
 LOGOUT_REDIRECT_URL = 'converter_page'
+
+

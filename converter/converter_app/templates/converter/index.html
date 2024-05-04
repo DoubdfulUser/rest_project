@@ -5,4 +5,73 @@
 
 <h1>{{ title }}</h1>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Currency Converter</h1>
+        <form id="currencyConverterForm" class="currency-form">
+            <label for="fromCurrency">From:</label>
+            <select id="fromCurrency">
+                <!-- Options will be filled dynamically using JavaScript -->
+            </select>
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" min="0" step="0.01">
+            <button type="button" onclick="convertCurrency()">Convert</button>
+        </form>
+        <div id="result"></div>
+    </div>
+</body>
+</html>
+
+
+    <script>
+        // Fetch currencies from API and populate the select dropdown
+        fetch('https://api.nbp.pl/api/exchangerates/tables/C/')
+            .then(response => response.json())
+            .then(data => {
+                const currencies = data[0].rates;
+                const selectElement = document.getElementById('fromCurrency');
+                currencies.forEach(currency => {
+                    const option = document.createElement('option');
+                    option.value = currency.code;
+                    option.textContent = `${currency.code} - ${currency.currency}`;
+                    selectElement.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching currencies:', error));
+
+        // Function to convert currency
+        function convertCurrency() {
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            console.log('From Currency:', fromCurrency);
+            console.log('Amount:', amount);
+
+            fetch(`https://api.nbp.pl/api/exchangerates/rates/A/${fromCurrency}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const exchangeRate = data.rates[0].mid;
+                    console.log('Exchange Rate:', exchangeRate);
+                    const result = amount * exchangeRate;
+                    console.log('Result:', result);
+                    document.getElementById('result').textContent = `Result: ${result.toFixed(2)} PLN`;
+                })
+                .catch(error => console.error('Error converting currency:', error));
+        }
+    </script>
+</body>
+</html>
+
+
+</body>
+</html>
+
+
 {% endblock %}

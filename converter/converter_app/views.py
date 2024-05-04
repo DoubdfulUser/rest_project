@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.sites import requests
+import requests
 from django.shortcuts import render, redirect
 from .models import *
 from django import template
+
 
 register = template.Library()
 
@@ -14,6 +15,7 @@ menu = [{'title': 'Converter', 'url_name': 'converter_page'},
         ]
 
 def converter_page(request):
+    response = requests.get('https://api.nbp.pl/api/exchangerates/tables/C/')
     context = {
         'menu': menu,
         'title': menu[0]['title'],

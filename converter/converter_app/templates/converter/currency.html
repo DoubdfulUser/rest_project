@@ -5,4 +5,84 @@
 
 <h1>{{ title }}</h1>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <h1>Exchange Rates</h1>
+        <form id="exchangeRatesForm" class="exchange-rates-form">
+            <label for="tableType">Table Type:</label>
+            <select id="tableType">
+                <option value="A">Table A</option>
+                <option value="B">Table B</option>
+                <option value="C">Table C</option>
+            </select>
+            <label for="topCount">Top Count:</label>
+            <input type="number" id="topCount" min="1" max="10" value="1">
+            <button type="button" onclick="getExchangeRates()">Get Rates</button>
+        </form>
+        <div id="exchangeRates"></div>
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+        // Вызываем функцию для загрузки данных при загрузке страницы
+        getExchangeRates();
+        });
+
+
+        function getExchangeRates() {
+        const tableType = document.getElementById('tableType').value;
+        const topCount = document.getElementById('topCount').value;
+
+        console.log(tableType)
+        console.log(topCount)
+
+
+        fetch(`http://api.nbp.pl/api/exchangerates/tables/${tableType}/last/${topCount}/`)
+            .then(response => response.json())
+            .then(data => {
+                displayExchangeRates(data);
+            })
+            .catch(error => console.error('Error fetching exchange rates:', error));
+        }
+
+
+        function displayExchangeRates(data) {
+            const exchangeRatesDiv = document.getElementById('exchangeRates');
+            exchangeRatesDiv.innerHTML = ''; // Очищаем предыдущие данные
+
+            data.forEach(table => {
+                const tableDate = table.effectiveDate;
+                const rates = table.rates;
+
+                const tableDiv = document.createElement('div');
+                tableDiv.classList.add('exchange-rate-table');
+
+                const heading = document.createElement('h2');
+                heading.textContent = `Exchange Rates Table (${tableDate})`;
+                tableDiv.appendChild(heading);
+
+                const ratesList = document.createElement('ul');
+                rates.forEach(rate => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${rate.currency} - ${rate.mid}`;
+                    ratesList.appendChild(listItem);
+                });
+
+                tableDiv.appendChild(ratesList);
+                exchangeRatesDiv.appendChild(tableDiv);
+            });
+        }
+
+    </script>
+</body>
+</html>
+
+
 {% endblock %}
