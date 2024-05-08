@@ -1,13 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView
-
+from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from .forms import LoginUserForm, RegisterUserForm
 from django.urls import reverse, reverse_lazy
-from converter_app.views import menu
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+
+from .serializers import UserSerializer
+
 
 class LoginUser(LoginView):
     form_class = LoginUserForm
@@ -25,3 +27,21 @@ class RegisterUser(CreateView):
 def logout_user(request):
     logout(request)
     return HttpResponseRedirect(reverse('users:login'))
+
+
+class UserAPIList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser, )
+
+
+class UserAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser, )
+
+
+class UserAPIDestroy(generics.RetrieveDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser, )
