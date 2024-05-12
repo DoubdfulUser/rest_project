@@ -1,0 +1,114 @@
+{% extends 'converter/base.html' %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Exchange</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+    .container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 500px; /* Увеличиваем ширину контейнера */
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+
+    .submit-button {
+        display: block;
+        width: 200px; /* Ширина кнопки */
+        margin: 0 auto; /* Центрирование кнопки */
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+
+    .total-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="currency-buy-form">
+            <div class="form-group">
+
+            <h1>Buy currency</h1>
+            <form method="post">
+                {% csrf_token %}
+                <div class="total-container">
+                    <div id="converted_amount"></div>
+                </div>
+
+                    {{ form.as_p }}
+                <p><button type="submit" class="submit-button">Proceed to Payment</button></p>
+            </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#id_total, #id_buy_currency').on('input', function() {
+                var total = $('#id_total').val();
+                var currency = $('#id_buy_currency').val();
+                // Здесь вы можете вызвать функцию для получения курса валюты
+                var rate = getExchangeRate(currency);
+                var converted_amount = (total / rate).toFixed(3);
+                var currencyCode = $('#id_buy_currency option:selected').text(); // Получаем код выбранной валюты
+                $('#converted_amount').text('You receive: ' + converted_amount + ' ' + currency + ' ' + currencyCode);
+            });
+        });
+
+        function getExchangeRate(currency) {
+            // Здесь вы можете сделать запрос к API для получения курса валюты
+            var rate = 1;
+            $.ajax({
+                url: 'http://api.nbp.pl/api/exchangerates/rates/A/' + currency + '/',
+                async: false,
+                dataType: 'json',
+                success: function(json) {
+                    rate = json.rates[0].mid;
+                }
+            });
+            return rate;
+        }
+    </script>
+
+</body>
+</html>
+
+
+{% endblock content %}

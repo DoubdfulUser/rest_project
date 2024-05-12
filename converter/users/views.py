@@ -7,7 +7,8 @@ from .forms import LoginUserForm, RegisterUserForm
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.models import User
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer
 
 
@@ -15,6 +16,7 @@ class LoginUser(LoginView):
     form_class = LoginUserForm
     template_name = 'users/login.html'
     extra_context = {'title': 'Authorization'}
+
 
 
 class RegisterUser(CreateView):
@@ -45,3 +47,8 @@ class UserAPIDestroy(generics.RetrieveDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser, )
+
+
+class PaymentsCreateView(generics.CreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]

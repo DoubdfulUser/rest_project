@@ -1,0 +1,23 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details</title>
+</head>
+<body>
+    <h1>Payment Details</h1>
+    <p>Payment ID: {{ payment.id }}</p>
+    <p>Amount: {{ payment.amount }}</p>
+    <!-- Отображение других данных платежа -->
+
+    <!-- Форма для ввода дополнительных данных платежа -->
+    <form action="{{ form.action }}" method="{{ form.method }}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="Proceed to Payment" /></p>
+    </form>
+</body>
+</html>

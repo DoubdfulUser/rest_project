@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-y*a7)#x3mz$dzn$od^vr_6a0rkjwlgda3vtq6hg2m!0kz!zqgj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'converter_app.apps.ConverterAppConfig',
     'users',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'payments',
+    'mypaymentapp'
 ]
 
 MIDDLEWARE = [
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'converter.middleware.CustomErrorMiddleware'
 ]
 
 ROOT_URLCONF = 'converter.urls'
@@ -137,6 +140,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'converter_page'
 LOGOUT_REDIRECT_URL = 'converter_page'
+LOGIN_URL = 'users:login'
 
 
 REST_FRAMEWORK = {
@@ -147,6 +151,8 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+
     )
 }
 
@@ -190,3 +196,22 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+PAYMENT_HOST = 'localhost:8000'
+
+# Whether to use TLS (HTTPS). If false, will use plain-text HTTP.
+# Defaults to ``not settings.DEBUG``.
+PAYMENT_USES_SSL = False
+PAYMENT_MODEL = 'mypaymentapp.Payment'
+
+PAYMENT_VARIANTS = {
+    'payu': ('payments_payu.provider.PayuProvider', {
+        'pos_id': '478461',
+        'second_key': '3a85b381e8c045b2b599d1b4296b6880',
+        'client_secret': 'f0373a54d1dd75ee662d404eb5cb4861',
+        'sandbox': True,
+        'capture': False,
+    }),
+}
+
+

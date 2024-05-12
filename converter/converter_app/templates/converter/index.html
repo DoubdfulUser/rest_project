@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<h1>{{ title }}</h1>
+<h1>Currency Converter</h1>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,24 +11,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Currency Converter</title>
+
 </head>
 <body>
     <div class="container">
-        <h1>Currency Converter</h1>
-        <form id="currencyConverterForm" class="currency-form">
-            <label for="fromCurrency">From:</label>
-            <select id="fromCurrency">
-                <!-- Options will be filled dynamically using JavaScript -->
-            </select>
-            <label for="amount">Amount:</label>
-            <input type="number" id="amount" min="0" step="0.01">
-            <button type="button" onclick="convertCurrency()">Convert</button>
-        </form>
-        <div id="result"></div>
-    </div>
-</body>
-</html>
+        <h3>Convert from PLN zloty to other currency</h3>
+        <div class="currency-form">
+            <form id="currencyConverterForm1">
+                <label for="amount1">Amount:</label>
+                <input type="number" id="amount1" min="0" step="0.01">
+                <label for="fromCurrency1">To:</label>
+                <select id="fromCurrency1">
+                    <!-- Options will be filled dynamically using JavaScript -->
+                </select>
+                <button type="button" onclick="convertCurrency1()">Convert</button>
+            </form>
+            <div id="result1" class="result"></div>
+        </div>
 
+        <h3>Convert from other to other currencies</h3>
+
+        <div class="currency-form">
+            <form id="currencyConverterForm2">
+                <label for="amount2">Amount:</label>
+                <input type="number" id="amount2" min="0" step="0.01">
+                <label for="fromCurrency2">From:</label>
+                <select id="fromCurrency2">
+                    <!-- Options will be filled dynamically using JavaScript -->
+                </select>
+                <label for="toCurrency2">To:</label>
+                <select id="toCurrency2">
+                    <!-- Options will be filled dynamically using JavaScript -->
+                </select>
+                <button type="button" onclick="convertCurrency2()">Convert</button>
+            </form>
+            <div id="result2" class="result"></div>
+        </div>
+    </div>
 
     <script>
         // Fetch currencies from API and populate the select dropdown
@@ -36,20 +55,24 @@
             .then(response => response.json())
             .then(data => {
                 const currencies = data[0].rates;
-                const selectElement = document.getElementById('fromCurrency');
+                const selectElement1 = document.getElementById('fromCurrency1');
+                const selectElement2 = document.getElementById('fromCurrency2');
+                const selectElement3 = document.getElementById('toCurrency2');
                 currencies.forEach(currency => {
                     const option = document.createElement('option');
                     option.value = currency.code;
                     option.textContent = `${currency.code} - ${currency.currency}`;
-                    selectElement.appendChild(option);
+                    selectElement1.appendChild(option.cloneNode(true));
+                    selectElement2.appendChild(option.cloneNode(true));
+                    selectElement3.appendChild(option.cloneNode(true));
                 });
             })
             .catch(error => console.error('Error fetching currencies:', error));
 
-        // Function to convert currency
-        function convertCurrency() {
-            const fromCurrency = document.getElementById('fromCurrency').value;
-            const amount = parseFloat(document.getElementById('amount').value);
+        // Function to convert currency for the first form
+        function convertCurrency1() {
+            const fromCurrency = document.getElementById('fromCurrency1').value;
+            const amount = parseFloat(document.getElementById('amount1').value);
 
             console.log('From Currency:', fromCurrency);
             console.log('Amount:', amount);
@@ -59,19 +82,46 @@
                 .then(data => {
                     const exchangeRate = data.rates[0].mid;
                     console.log('Exchange Rate:', exchangeRate);
-                    const result = amount * exchangeRate;
+                    const result = amount / exchangeRate;
                     console.log('Result:', result);
-                    document.getElementById('result').textContent = `Result: ${result.toFixed(2)} PLN`;
+                    document.getElementById('result1').textContent = `${amount.toFixed(2)} PLN = ${result.toFixed(2)} ${fromCurrency}`;
+                })
+                .catch(error => console.error('Error converting currency:', error));
+        }
+
+        // Function to convert currency for the second form
+        function convertCurrency2() {
+            const fromCurrency = document.getElementById('fromCurrency2').value;
+            const toCurrency = document.getElementById('toCurrency2').value;
+            const amount = parseFloat(document.getElementById('amount2').value);
+
+            console.log('From Currency:', fromCurrency);
+            console.log('To Currency:', toCurrency);
+            console.log('Amount:', amount);
+
+            fetch(`https://api.nbp.pl/api/exchangerates/rates/A/${fromCurrency}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const fromExchangeRate = data.rates[0].mid;
+                    console.log('From Exchange Rate:', fromExchangeRate);
+                    fetch(`https://api.nbp.pl/api/exchangerates/rates/A/${toCurrency}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const toExchangeRate = data.rates[0].mid;
+                            console.log('To Exchange Rate:', toExchangeRate);
+                            const result = (amount * fromExchangeRate) / toExchangeRate;
+                            console.log('Result:', result);
+                            document.getElementById('result2').textContent = `${amount.toFixed(2)} ${fromCurrency} = ${result.toFixed(2)} ${toCurrency}`;
+                        })
+                        .catch(error => console.error('Error converting currency:', error));
                 })
                 .catch(error => console.error('Error converting currency:', error));
         }
     </script>
-</body>
-</html>
-
 
 </body>
 </html>
+
 
 
 {% endblock %}
