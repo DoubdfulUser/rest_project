@@ -3,15 +3,53 @@
 
 {% block content %}
 
-<h1>Currency Converter</h1>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currency Converter</title>
+    <style>
+    .container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 80%;
+        margin-top: 80px;
+        opacity: 0.9;
+    }
 
+    .currency-form label {
+        margin-bottom: 8px;
+    }
+
+    .currency-form select,
+    .currency-form input,
+    .currency-form button {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .currency-form button {
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .currency-form button:hover {
+        background-color: #0056b3;
+    }
+
+    #result {
+        margin-top: 15px;
+        font-weight: bold;
+        text-align: center;
+    }
+    </style>
 </head>
 <body>
     <div class="container">

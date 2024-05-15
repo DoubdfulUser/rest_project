@@ -5,9 +5,6 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 class LoginUserForm(AuthenticationForm):
 
-    #username = forms.CharField(label="Login", widget=forms.TextInput(attrs={'class': 'form-input'}))
-    #password = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={'class': 'form-input'}))
-
     class Meta:
         model = get_user_model()
         fields = ['username', 'password']
@@ -40,3 +37,11 @@ class RegisterUserForm(UserCreationForm):
         if get_user_model().objects.filter(email=email).exists():
             raise forms.ValidationError('Cannot register a user with this email')
         return email
+
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = super().clean_password2()
+        if password1 and len(password1) < 8:
+            raise forms.ValidationError('The password is too short, it must contain at least 8 characters.')
+        return password2

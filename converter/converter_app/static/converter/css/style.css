@@ -40,50 +40,7 @@
 }
 
 
-.exchange-rates-form label {
-    margin-bottom: 8px;
-}
 
-.exchange-rates-form select,
-.exchange-rates-form input,
-.exchange-rates-form button {
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.exchange-rates-form button {
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.exchange-rates-form button:hover {
-    background-color: #0056b3;
-}
-
-#exchangeRates {
-    margin-top: 15px;
-}
-
-.exchange-rate-table {
-    margin-bottom: 20px;
-}
-
-.exchange-rate-table h2 {
-    margin-bottom: 10px;
-}
-
-.exchange-rate-table ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-.exchange-rate-table li {
-    margin-bottom: 5px;
-}
 
 #currency-buy-form {
     background-color: #fff;

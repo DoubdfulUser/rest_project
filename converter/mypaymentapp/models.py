@@ -1,7 +1,6 @@
 from typing import Iterable
 
 from decimal import Decimal
-from uuid import uuid4
 
 from payments import PurchasedItem
 from payments.models import BasePayment
@@ -11,6 +10,7 @@ from django.db import models
 class Payment(BasePayment):
 
     buy_currency = models.CharField(max_length=10)
+    access_token = models.CharField(max_length=255, null=True, blank=True)
 
 
     def get_failure_url(self) -> str:

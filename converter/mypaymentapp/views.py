@@ -9,8 +9,8 @@ from django.template.response import TemplateResponse
 from payments import get_payment_model, RedirectNeeded
 import requests
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-import hashlib
+import json
+import uuid
 import time
 
 
@@ -39,17 +39,28 @@ def get_payu_access_token():
     url = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize'
     data = {
         'grant_type': 'client_credentials',
-        'client_id': '478461',  # Замените на свой client_id
-        'client_secret': 'f0373a54d1dd75ee662d404eb5cb4861'  # Замените на свой client_secret
+        'client_id': '478461',
+        'client_secret': 'f0373a54d1dd75ee662d404eb5cb4861'
     }
     response = requests.post(url, data=data)
     return response.json().get('access_token')
+
+
+def create_payu_order(token, order_data):
+    url = 'https://secure.snd.payu.com/api/v2_1/orders'
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {token}'
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(order_data))
+    print("Response status code: ", response.status_code)
+    return response
+
 
 class PaymentCreationForm(forms.ModelForm):
 
     VARIANT_CHOICES = [
         ('payu', 'PayU'),
-        # Добавьте здесь другие варианты, если они есть
     ]
 
     variant = forms.ChoiceField(choices=VARIANT_CHOICES)
@@ -73,13 +84,42 @@ class PaymentCreationForm(forms.ModelForm):
 @api_view(['GET', 'POST'])
 @login_required
 def payment_page(request):
-
     if request.method == 'POST':
         form = PaymentCreationForm(request.POST)
         if form.is_valid():
             payment = form.save()
-            # Перенаправьте пользователя на URL успеха
-            return redirect(payment.get_success_url())
+            token = get_payu_access_token()
+            print("TOKEN:",token)
+            order_data = {
+                "continueUrl": "http://localhost:8000/payments/21/success",
+                "notifyUrl": "http://localhost:8000/payments/21/success",
+                "customerIp": "127.0.0.1",
+                "merchantPosId": "478461",
+                "description": "string",
+                "additionalDescription": "string",
+                "visibleDescription": "string",
+                "statementDescription": "string",
+                "extOrderId": str(uuid.uuid4()) + str(int(time.time() * 1000)),
+                "currencyCode": "PLN",
+                "totalAmount": "10",
+                "validityTime": "100000",
+                "cardOnFile": "FIRST",
+
+                "buyer": {
+                    "extCustomerId": "string",
+                    "email": "email@email.com",
+                    "phone": "+48 225108001",
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "nin": 123456789,
+                    "language": "pl",
+                    "delivery": {}
+                },
+            }
+            response = create_payu_order(token, order_data)
+            if response.status_code == 200:
+                return redirect(payment.get_success_url())
+
     else:
         initial_data = {
             'customer_ip_address': get_client_ip(request),
@@ -89,7 +129,6 @@ def payment_page(request):
             'delivery': 0
         }
         form = PaymentCreationForm(initial=initial_data)
-
     return render(request, 'payment_page.html', {'form': form})
 
 
@@ -103,28 +142,11 @@ def get_client_ip(request):
 
 
 
-def create_unique_extOrderId(order_id):
-    # Генерируем уникальный хэш, используя текущее время
-    unique_hash = hashlib.sha1(str(time.time()).encode()).hexdigest()[:10]
-    # Создаем extOrderId, добавляя уникальный хэш к id заказа
-    extOrderId = f"{order_id}-{unique_hash}"
-    return extOrderId
-
-
 def payment_success(request, payment_id):
-    # Здесь вы можете добавить любую логику, которую хотите выполнить перед отображением страницы успеха
-    ...
-    # Вызываем payment_details
     response = payment_details(request, payment_id)
-    # Если payment_details возвращает HTTP-ответ, возвращаем его
-    if isinstance(response, HttpResponse):
-        return response
-    # Иначе продолжаем обработку payment_success
-    ...
-    return render(request, 'payment_success.html', {'payment_id': payment_id})
+    return response
 
 
 def payment_failure(request, payment_id):
-    # Здесь вы можете добавить любую логику, которую хотите выполнить после неудачного платежа
     return render(request, 'payment_failure.html', {'payment_id': payment_id})
 

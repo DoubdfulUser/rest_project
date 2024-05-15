@@ -1,6 +1,6 @@
 from django.urls import path, include
-
 from .views import *
+
 
 urlpatterns = [
     path('', converter_page, name='converter_page'),

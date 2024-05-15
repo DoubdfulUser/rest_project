@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os.path
 from pathlib import Path
 from datetime import timedelta
+import django
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,15 +28,15 @@ SECRET_KEY = 'django-insecure-y*a7)#x3mz$dzn$od^vr_6a0rkjwlgda3vtq6hg2m!0kz!zqgj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -43,8 +44,10 @@ INSTALLED_APPS = [
     'users',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_swagger',
     'payments',
-    'mypaymentapp'
+    'mypaymentapp',
+
 ]
 
 MIDDLEWARE = [
@@ -55,7 +58,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'converter.middleware.CustomErrorMiddleware'
 ]
 
 ROOT_URLCONF = 'converter.urls'
@@ -63,7 +65,7 @@ ROOT_URLCONF = 'converter.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,7 +128,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = []
 
@@ -215,3 +217,4 @@ PAYMENT_VARIANTS = {
 }
 
 
+django.setup()

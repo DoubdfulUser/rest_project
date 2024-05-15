@@ -1,9 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-import requests
 from django.shortcuts import render, redirect
 from django import template
-from django.http import HttpResponseNotFound, HttpResponseForbidden
 
 
 register = template.Library()
@@ -17,7 +14,6 @@ menu = [{'title': 'Converter', 'url_name': 'converter_page'},
 
 
 def converter_page(request):
-    response = requests.get('https://api.nbp.pl/api/exchangerates/tables/C/')
     context = {
         'menu': menu,
         'title': menu[0]['title'],
@@ -42,11 +38,13 @@ def login_page(request):
 
 
 def register_page(request):
+    from django.contrib.auth.forms import UserCreationForm
+
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login')
+            return redirect('login_page')
     else:
         form = UserCreationForm()
 
@@ -63,6 +61,4 @@ def get_menu():
     return menu
 
 
-def handler404(request, exception):
-    return render(request, '404.html', status=404)
 
